@@ -5,6 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 
+import '../app_colors.dart';
+
 class ListCompromissoPage extends StatefulWidget {
   const ListCompromissoPage({super.key});
 
@@ -13,6 +15,9 @@ class ListCompromissoPage extends StatefulWidget {
 }
 
 class _ListCompromissoPageState extends State<ListCompromissoPage> {
+
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+
   Future<List<Compromisso>> buscarCompromissos() async {
     final response = await http.get(
       Uri.parse('http://10.0.2.2:4000/compromissos'),
@@ -29,11 +34,114 @@ class _ListCompromissoPageState extends State<ListCompromissoPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: _scaffoldKey,
       appBar: AppBar(
         automaticallyImplyLeading: true,
         title: const Text("Compromissos"),
         backgroundColor: Theme.of(context).colorScheme.primary,
+        leading: IconButton(
+          onPressed: () {
+            _scaffoldKey.currentState?.openDrawer();
+          },
+          icon: Icon(Icons.menu),
+        ),
+        actions: [
+          IconButton(onPressed: () {
+            Navigator.pop(context);
+          }, icon: Icon(Icons.arrow_back))
+        ],
       ),
+
+      drawer: Drawer(
+        backgroundColor: Theme.of(context).colorScheme.secondary,
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: [
+
+            SizedBox(height: 50),
+            GestureDetector(
+              onTap: () {
+                setState(() {
+                  Navigator.pop(context);
+                });
+              },
+              child: Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(15),
+                  color: AppColors.quaternary,
+                ),
+                width: 20,
+                height: 120,
+                margin: EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+                child: Icon(Icons.cancel, size: 120,),
+              ),
+            ),
+
+            SizedBox(height: 50),
+            GestureDetector(
+              onTap: () {
+                setState(() {
+                  Navigator.pushNamed(context, '/');
+                });
+              },
+              child: Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(15),
+                  color: AppColors.quaternary,
+                ),
+                width: 20,
+                height: 120,
+                margin: EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+                child: Icon(Icons.home, size: 120,),
+              ),
+            ),
+
+            SizedBox(height: 50),
+            GestureDetector(
+              onTap: () {
+                setState(() {
+                  Navigator.pushNamed(context, '/agendaVirtual');
+                });
+              },
+              child: Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(15),
+                  color: AppColors.quaternary,
+                ),
+                width: 20,
+                height: 120,
+                margin: EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+                child: Icon(Icons.calendar_month, size: 120),
+              ),
+            ),
+
+            SizedBox(height: 50),
+            GestureDetector(
+              onTap: () {
+                setState(() {
+                  Navigator.pop(context);
+                });
+              },
+              child: Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(15),
+                  color: AppColors.quaternary,
+                ),
+                width: 20,
+                height: 120,
+                margin: EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+                child: IconButton(
+                  onPressed: () {
+                    Navigator.pushNamed(context, '/compromissosList');
+                  },
+                  icon: Icon(Icons.notifications, size: 120),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+
       body: Column(
         children: [
           Expanded(

@@ -15,16 +15,28 @@ class EditarCompromissoPage extends StatefulWidget {
 
 class _EditarCompromissoPageState extends State<EditarCompromissoPage> {
   final _formKey = GlobalKey<FormState>();
-  late TextEditingController _tituloController = TextEditingController(text: widget.compromisso.titulo);
-  late TextEditingController _descricaoController = TextEditingController(text: widget.compromisso.descricao);
-  late TextEditingController _dataController = TextEditingController(text: widget.compromisso.data);
+  late TextEditingController _tituloController = TextEditingController(
+    text: widget.compromisso.titulo,
+  );
+  late TextEditingController _descricaoController = TextEditingController(
+    text: widget.compromisso.descricao,
+  );
+  late TextEditingController _dataController = TextEditingController(
+    text: widget.compromisso.data,
+  );
 
   @override
   void initState() {
     super.initState();
     _tituloController = TextEditingController(text: widget.compromisso.titulo);
-    _descricaoController = TextEditingController(text: widget.compromisso.descricao);
-    _dataController = TextEditingController(text: DateFormat('dd/MM/yyyy').format(DateTime.parse(widget.compromisso.data)));
+    _descricaoController = TextEditingController(
+      text: widget.compromisso.descricao,
+    );
+    _dataController = TextEditingController(
+      text: DateFormat(
+        'dd/MM/yyyy',
+      ).format(DateTime.parse(widget.compromisso.data)),
+    );
   }
 
   void atualizarCompromisso() async {
@@ -33,7 +45,7 @@ class _EditarCompromissoPageState extends State<EditarCompromissoPage> {
     final compromissoAtualizado = {
       "titulo": _tituloController.text,
       "descricao": _descricaoController.text,
-      "data": _dataController.text,
+      "data": widget.compromisso.data,
     };
 
     final response = await http.put(
@@ -46,7 +58,7 @@ class _EditarCompromissoPageState extends State<EditarCompromissoPage> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Compromisso atualizado com sucesso!")),
       );
-      Navigator.pop(context, true); // volta pra tela anterior
+      Navigator.pop(context, true);
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Erro ao atualizar compromisso.")),
@@ -56,9 +68,9 @@ class _EditarCompromissoPageState extends State<EditarCompromissoPage> {
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       appBar: AppBar(
+        title: Text("Editar Compromisso"),
         automaticallyImplyLeading: true,
         backgroundColor: Theme.of(context).colorScheme.primary,
       ),
@@ -70,11 +82,6 @@ class _EditarCompromissoPageState extends State<EditarCompromissoPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                Text(
-                  "Editar Compromisso",
-                  style: Theme.of(context).textTheme.headlineSmall,
-                  textAlign: TextAlign.center,
-                ),
                 const SizedBox(height: 16),
                 TextFormField(
                   controller: _tituloController,
@@ -94,6 +101,7 @@ class _EditarCompromissoPageState extends State<EditarCompromissoPage> {
                 const SizedBox(height: 16),
                 TextFormField(
                   controller: _dataController,
+                  readOnly: true,
                   decoration: InputDecoration(
                     labelText: 'Data',
                     border: const OutlineInputBorder(),
@@ -104,12 +112,15 @@ class _EditarCompromissoPageState extends State<EditarCompromissoPage> {
                     FocusScope.of(context).unfocus();
                     final data = await showDatePicker(
                       context: context,
-                      initialDate: DateTime.tryParse(_dataController.text) ?? DateTime.now(),
+                      initialDate:
+                          DateTime.tryParse(_dataController.text) ??
+                          DateTime.now(),
                       firstDate: DateTime(2000),
                       lastDate: DateTime(2100),
                     );
                     if (data != null) {
-                      _dataController.text = data.toIso8601String().split("T").first;
+                      _dataController.text =
+                          data.toIso8601String().split("T").first;
                     }
                   },
                   validator: (value) {

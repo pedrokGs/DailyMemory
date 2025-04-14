@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:table_calendar/table_calendar.dart';
 
+import '../app_colors.dart';
+
 class AgendaVirtualPage extends StatefulWidget {
   const AgendaVirtualPage({super.key});
 
@@ -11,6 +13,8 @@ class AgendaVirtualPage extends StatefulWidget {
 }
 
 class _AgendaVirtualPageState extends State<AgendaVirtualPage> {
+
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   late Map<DateTime, List<String>> _compromissos;
   late DateTime _selectedDay;
   late DateTime _focusedDay;
@@ -19,13 +23,11 @@ class _AgendaVirtualPageState extends State<AgendaVirtualPage> {
   void initState() {
     super.initState();
     _compromissos = {};
-    // Ajuste aqui para uma data que você sabe ter compromisso
     _selectedDay = DateTime.now();
     _focusedDay = DateTime.now();
     _loadCompromissos();
   }
 
-  // Função para carregar os compromissos da API
   Future<void> _loadCompromissos() async {
     final response = await http.get(Uri.parse('http://10.0.2.2:4000/compromissos'));
 
@@ -35,14 +37,11 @@ class _AgendaVirtualPageState extends State<AgendaVirtualPage> {
       setState(() {
         _compromissos.clear();
         for (var compromisso in compromissosJson) {
-          // String no formato "2025-04-16T00:00:00.000Z"
           final dataString = compromisso['data'] as String;
           final data = DateTime.parse(dataString);
 
-          // Ignora o horário, usa só ano-mês-dia
           final somenteData = DateTime(data.year, data.month, data.day);
 
-          // Se ainda não existe uma lista para essa data, cria
           _compromissos[somenteData] ??= [];
           _compromissos[somenteData]!.add(compromisso['titulo']);
         }
@@ -54,7 +53,6 @@ class _AgendaVirtualPageState extends State<AgendaVirtualPage> {
 
   @override
   Widget build(BuildContext context) {
-    // Obtém os compromissos do dia selecionado
     final compromissosDoDia = _compromissos[DateTime(
       _selectedDay.year,
       _selectedDay.month,
@@ -62,18 +60,120 @@ class _AgendaVirtualPageState extends State<AgendaVirtualPage> {
     )] ?? [];
 
     return Scaffold(
+      key: _scaffoldKey,
       appBar: AppBar(
         automaticallyImplyLeading: true,
         title: Text("Calendário Virtual"),
+        leading: IconButton(
+          onPressed: () {
+            _scaffoldKey.currentState?.openDrawer();
+          },
+          icon: Icon(Icons.menu),
+        ),
         centerTitle: true,
         backgroundColor: Theme.of(context).colorScheme.primary,
+        actions: [
+          IconButton(onPressed: () {
+            Navigator.pop(context);
+          }, icon: Icon(Icons.arrow_back))
+        ],
       ),
+
+      drawer: Drawer(
+        backgroundColor: Theme.of(context).colorScheme.secondary,
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: [
+
+            SizedBox(height: 50),
+            GestureDetector(
+              onTap: () {
+                setState(() {
+                  Navigator.pop(context);
+                });
+              },
+              child: Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(15),
+                  color: AppColors.quaternary,
+                ),
+                width: 20,
+                height: 120,
+                margin: EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+                child: Icon(Icons.cancel, size: 120,),
+              ),
+            ),
+
+            SizedBox(height: 50),
+            GestureDetector(
+              onTap: () {
+                setState(() {
+                  Navigator.pushNamed(context, '/');
+                });
+              },
+              child: Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(15),
+                  color: AppColors.quaternary,
+                ),
+                width: 20,
+                height: 120,
+                margin: EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+                child: Icon(Icons.home, size: 120,),
+              ),
+            ),
+
+            SizedBox(height: 50),
+            GestureDetector(
+              onTap: () {
+                setState(() {
+                  Navigator.pushNamed(context, '/agendaVirtual');
+                });
+              },
+              child: Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(15),
+                  color: AppColors.quaternary,
+                ),
+                width: 20,
+                height: 120,
+                margin: EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+                child: Icon(Icons.calendar_month, size: 120),
+              ),
+            ),
+
+            SizedBox(height: 50),
+            GestureDetector(
+              onTap: () {
+                setState(() {
+                  Navigator.pop(context);
+                });
+              },
+              child: Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(15),
+                  color: AppColors.quaternary,
+                ),
+                width: 20,
+                height: 120,
+                margin: EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+                child: IconButton(
+                  onPressed: () {
+                    Navigator.pushNamed(context, '/compromissosList');
+                  },
+                  icon: Icon(Icons.notifications, size: 120),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+
       body: Center(
         child: Column(
           children: [
             const SizedBox(height: 24),
 
-            // Calendário
             Container(
               margin: const EdgeInsets.symmetric(horizontal: 16),
               decoration: BoxDecoration(
@@ -130,9 +230,13 @@ class _AgendaVirtualPageState extends State<AgendaVirtualPage> {
                       : ListView.builder(
                     itemCount: compromissosDoDia.length,
                     itemBuilder: (context, index) {
-                      return ListTile(
-                        leading: const Icon(Icons.event),
-                        title: Text(compromissosDoDia[index]),
+                      return GestureDetector(
+                        onTap: () =>
+                        Navigator.pushNamed(context, "/compromissosList"),
+                        child: ListTile(
+                          leading: const Icon(Icons.event),
+                          title: Text(compromissosDoDia[index]),
+                        ),
                       );
                     },
                   ),
