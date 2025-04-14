@@ -24,6 +24,8 @@ class _HomePageState extends State<HomePage> {
           },
           icon: Icon(Icons.menu),
         ),
+        centerTitle: true,
+        title: Image.asset("assets/img/logo.png", height: 110, width: 120,),
         automaticallyImplyLeading: false,
         backgroundColor: Theme.of(context).colorScheme.primary,
       ),
